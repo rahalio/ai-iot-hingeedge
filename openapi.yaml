@@ -1,0 +1,418 @@
+openapi: 3.0.3
+info:
+  title: HingeEdge
+  version: 0.1.0
+  description: >-
+    Cloud vs edge AI placement advisor with checklists, datasets, and adoption roadmaps.
+  x-product-slug: ai-iot-hingeedge
+  x-source: ai-in-iot/ai-at-the-edge-whitepaper/
+servers:
+  - url: https://api.example.com
+tags:
+  - name: UseCases
+  - name: Checklists
+  - name: Placements
+  - name: Datasets
+  - name: Roadmaps
+paths:
+  /v1/use-cases:
+    get:
+      operationId: listUseCases
+      tags: [UseCases]
+      security: [{ ApiKeyAuth: [] }, { BearerAuth: [] }]
+      parameters: [{ $ref: "#/components/parameters/Cursor" }, { $ref: "#/components/parameters/Limit" }]
+      responses:
+        "200":
+          description: Use cases
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ListEnvelopeUseCase" }
+    post:
+      operationId: createUseCase
+      tags: [UseCases]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UseCaseCreate" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeUseCase" }
+  /v1/checklists:
+    get:
+      operationId: listChecklists
+      tags: [Checklists]
+      security: [{ ApiKeyAuth: [] }, { BearerAuth: [] }]
+      parameters: [{ $ref: "#/components/parameters/Cursor" }, { $ref: "#/components/parameters/Limit" }]
+      responses:
+        "200":
+          description: Checklists
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ListEnvelopeChecklistResult" }
+    post:
+      operationId: runChecklist
+      tags: [Checklists]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ChecklistResultCreate" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeChecklistResult" }
+  /v1/placements:
+    get:
+      operationId: listPlacements
+      tags: [Placements]
+      security: [{ ApiKeyAuth: [] }, { BearerAuth: [] }]
+      parameters: [{ $ref: "#/components/parameters/Cursor" }, { $ref: "#/components/parameters/Limit" }]
+      responses:
+        "200":
+          description: Placements
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ListEnvelopePlacementDecision" }
+    post:
+      operationId: createPlacement
+      tags: [Placements]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PlacementDecisionCreate" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopePlacementDecision" }
+  /v1/datasets:
+    get:
+      operationId: listDatasets
+      tags: [Datasets]
+      security: [{ ApiKeyAuth: [] }, { BearerAuth: [] }]
+      parameters: [{ $ref: "#/components/parameters/Cursor" }, { $ref: "#/components/parameters/Limit" }]
+      responses:
+        "200":
+          description: Datasets
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ListEnvelopeDatasetRepo" }
+    post:
+      operationId: registerDataset
+      tags: [Datasets]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DatasetRepoCreate" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeDatasetRepo" }
+  /v1/roadmaps:
+    get:
+      operationId: listRoadmaps
+      tags: [Roadmaps]
+      security: [{ ApiKeyAuth: [] }, { BearerAuth: [] }]
+      parameters: [{ $ref: "#/components/parameters/Cursor" }, { $ref: "#/components/parameters/Limit" }]
+      responses:
+        "200":
+          description: Roadmaps
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ListEnvelopeRoadmap" }
+    post:
+      operationId: createRoadmap
+      tags: [Roadmaps]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RoadmapCreate" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeRoadmap" }
+  /v1/organizations/adoption-stage:
+    get:
+      operationId: getAdoptionStage
+      tags: [Roadmaps]
+      security: [{ BearerAuth: [] }]
+      responses:
+        "200":
+          description: Adoption stage
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeAdoptionStage" }
+    put:
+      operationId: setAdoptionStage
+      tags: [Roadmaps]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AdoptionStageUpdate" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataEnvelopeAdoptionStage" }
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    Cursor:
+      name: cursor
+      in: query
+      schema: { type: string }
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 200, default: 50 }
+  schemas:
+    ResponseMeta:
+      type: object
+      required: [requestId, timestamp]
+      properties:
+        requestId: { type: string }
+        timestamp: { type: string, format: date-time }
+    Problem:
+      type: object
+      required: [type, title, status]
+      properties:
+        type: { type: string, format: uri }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+
+    UseCase:
+      type: object
+      required: [id, name, template, status]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        template: { type: string, enum: [predictive_maintenance, supply_chain, custom, emissions, clinical] }
+        status: { type: string, enum: [draft, checklist_done, placed, operational] }
+        realtimeRequired: { type: boolean }
+    UseCaseCreate:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        template: { type: string, enum: [predictive_maintenance, supply_chain, custom, emissions, clinical] }
+        realtimeRequired: { type: boolean }
+    ChecklistResult:
+      type: object
+      required: [id, useCaseId, recommendation]
+      properties:
+        id: { type: string }
+        useCaseId: { type: string }
+        realtimeNeeded: { type: boolean }
+        latencySensitive: { type: boolean }
+        bandwidthLocalPreferred: { type: boolean }
+        downtimeSensitive: { type: boolean }
+        recommendation: { type: string, enum: [cloud, edge, hybrid] }
+    ChecklistResultCreate:
+      type: object
+      required: [useCaseId, realtimeNeeded, latencySensitive, bandwidthLocalPreferred, downtimeSensitive]
+      properties:
+        useCaseId: { type: string }
+        realtimeNeeded: { type: boolean }
+        latencySensitive: { type: boolean }
+        bandwidthLocalPreferred: { type: boolean }
+        downtimeSensitive: { type: boolean }
+    PlacementDecision:
+      type: object
+      required: [id, useCaseId, placement, status]
+      properties:
+        id: { type: string }
+        useCaseId: { type: string }
+        placement: { type: string, enum: [cloud, edge, hybrid] }
+        rationale: { type: string }
+        status: { type: string, enum: [proposed, approved] }
+        revisitTrigger: { type: string }
+    PlacementDecisionCreate:
+      type: object
+      required: [useCaseId, placement]
+      properties:
+        useCaseId: { type: string }
+        placement: { type: string, enum: [cloud, edge, hybrid] }
+        rationale: { type: string }
+        revisitTrigger: { type: string }
+    DatasetRepo:
+      type: object
+      required: [id, name, readiness]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        useCaseId: { type: string }
+        readiness: { type: string, enum: [missing, partial, ready] }
+        untappedEstimatePct: { type: number }
+    DatasetRepoCreate:
+      type: object
+      required: [name, readiness]
+      properties:
+        name: { type: string }
+        useCaseId: { type: string }
+        readiness: { type: string, enum: [missing, partial, ready] }
+        untappedEstimatePct: { type: number }
+    Roadmap:
+      type: object
+      required: [id, name, status]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        technologyNotes: { type: string }
+        dataNotes: { type: string }
+        peopleNotes: { type: string }
+        complianceRegion: { type: string }
+        status: { type: string, enum: [draft, active, completed] }
+    RoadmapCreate:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        technologyNotes: { type: string }
+        dataNotes: { type: string }
+        peopleNotes: { type: string }
+        complianceRegion: { type: string }
+    AdoptionStage:
+      type: object
+      required: [stage, assessedAt]
+      properties:
+        stage: { type: string, enum: [passive, experimenter, investigator, pioneer] }
+        assessedAt: { type: string, format: date-time }
+    AdoptionStageUpdate:
+      type: object
+      required: [stage]
+      properties:
+        stage: { type: string, enum: [passive, experimenter, investigator, pioneer] }
+    DataEnvelopeUseCase:
+      type: object
+      required: [data, meta]
+      properties:
+        data: { $ref: "#/components/schemas/UseCase" }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    ListEnvelopeUseCase:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [items]
+          properties:
+            items: { type: array, items: { $ref: "#/components/schemas/UseCase" } }
+            nextCursor: { type: string }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    DataEnvelopeChecklistResult:
+      type: object
+      required: [data, meta]
+      properties:
+        data: { $ref: "#/components/schemas/ChecklistResult" }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    ListEnvelopeChecklistResult:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [items]
+          properties:
+            items: { type: array, items: { $ref: "#/components/schemas/ChecklistResult" } }
+            nextCursor: { type: string }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    DataEnvelopePlacementDecision:
+      type: object
+      required: [data, meta]
+      properties:
+        data: { $ref: "#/components/schemas/PlacementDecision" }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    ListEnvelopePlacementDecision:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [items]
+          properties:
+            items: { type: array, items: { $ref: "#/components/schemas/PlacementDecision" } }
+            nextCursor: { type: string }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    DataEnvelopeDatasetRepo:
+      type: object
+      required: [data, meta]
+      properties:
+        data: { $ref: "#/components/schemas/DatasetRepo" }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    ListEnvelopeDatasetRepo:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [items]
+          properties:
+            items: { type: array, items: { $ref: "#/components/schemas/DatasetRepo" } }
+            nextCursor: { type: string }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    DataEnvelopeRoadmap:
+      type: object
+      required: [data, meta]
+      properties:
+        data: { $ref: "#/components/schemas/Roadmap" }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    ListEnvelopeRoadmap:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [items]
+          properties:
+            items: { type: array, items: { $ref: "#/components/schemas/Roadmap" } }
+            nextCursor: { type: string }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    DataEnvelopeAdoptionStage:
+      type: object
+      required: [data, meta]
+      properties:
+        data: { $ref: "#/components/schemas/AdoptionStage" }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
+    ListEnvelopeAdoptionStage:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [items]
+          properties:
+            items: { type: array, items: { $ref: "#/components/schemas/AdoptionStage" } }
+            nextCursor: { type: string }
+        meta: { $ref: "#/components/schemas/ResponseMeta" }
